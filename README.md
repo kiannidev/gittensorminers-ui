@@ -1,98 +1,81 @@
-# Gittensor Miners — Frontend
+# Gittensor Miners
 
-React dashboard for [Gittensor](https://gittensor.io) (Bittensor Subnet 74). Displays live miner rankings, whitelisted repositories, recent pull requests, and a personal **My Board** after GitHub login.
+A dashboard for miners on **Bittensor Subnet 74 (SN74)** — the subnet that rewards merged GitHub PRs in whitelisted open-source repos.
+
+It reads cached subnet data from the companion backend over REST and WebSocket, and surfaces live miner rankings, whitelisted repositories, recent pull requests, and a personal **My Board** after GitHub sign-in.
+
+Built with React 18, TypeScript, Vite 6, Tailwind CSS, and Socket.io.
 
 ![Gittensor Miners home page](./public/first%20page.png)
 
-## Stack
+## Main views
 
-- **Framework:** React 18, TypeScript
-- **Build:** Vite 6
-- **Styling:** Tailwind CSS
-- **Routing:** React Router 7
-- **Realtime:** Socket.io client
-- **Icons:** Lucide React
+- `/` is the home page — hero, live snapshot panels, and how-it-works.
+- `/miners` shows the miner leaderboard sorted by daily earnings.
+- `/miners/:githubId` is the miner detail view.
+- `/repositories` lists whitelisted repos in list or tile view.
+- `/repositories/:owner/:repoName` is the repo detail view.
+- `/prs/:owner/:repoName/:prNumber` is the pull request detail view.
+- `/my-board` is the signed-in personal dashboard (requires GitHub login).
+- `/help` links to in-app help and resources.
 
-## Prerequisites
+Live data updates automatically after each backend sync — no manual refresh needed.
 
-- Node.js 20+
-- Backend running locally (see `gittensorminers-back` setup in the monorepo)
-
-## Setup
+## Quick start
 
 ```bash
-cp .env.example .env
+git clone https://github.com/kiannidev/gittensorminers-ui.git
+cd gittensorminers-ui
 npm install
-npm run dev
+cp .env.example .env
+npm run dev                    # http://localhost:5173
 ```
 
-Open **http://localhost:5173**
+Requires Node.js 20+ and a running `gittensorminers-back` instance (see backend README).
 
-## Scripts
+## Development checks
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start Vite dev server (port 5173) |
-| `npm run build` | Type-check and production build |
-| `npm run preview` | Preview production build locally |
+```bash
+npm run build
+npm run preview
+```
 
-## Environment
+Run `npm run build` before submitting changes — it type-checks and produces the production bundle.
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `VITE_API_URL` | `http://localhost:4000` | Backend REST API base URL |
-| `VITE_WS_URL` | `http://localhost:4000` | Socket.io server URL |
+## GitHub setup
+
+Sign-in is handled by the backend via a **GitHub OAuth App**.
+
+**OAuth App** — https://github.com/settings/developers → New OAuth App
+
+- Homepage URL: `http://localhost:5173` (or your public URL in prod)
+- Callback URL: `http://localhost:4000/auth/github/callback`
+- Copy the client ID and secret into `gittensorminers-back/.env`.
+
+After login, **My Board** appears in the nav.
+
+## Access
+
+Anyone with a GitHub account can sign in through the backend OAuth flow. The frontend stores no credentials — session state comes from the backend.
+
+## Environment variables
+
+| Var | Purpose |
+| --- | --- |
+| `VITE_API_URL` | Backend REST API base URL (default `http://localhost:4000`) |
+| `VITE_WS_URL` | Socket.io server URL (default `http://localhost:4000`) |
 
 > In dev, Vite proxies `/api`, `/auth`, and `/socket.io` to the backend. Setting explicit URLs connects directly to port 4000 (recommended).
 
-## Pages
+## Production
 
-| Route | Description |
-|-------|-------------|
-| `/` | Home — hero, live snapshot, how-it-works |
-| `/repositories` | Whitelisted repos (list / tile views) |
-| `/repositories/:owner/:repoName` | Repo detail |
-| `/miners` | Miner leaderboard |
-| `/miners/:githubId` | Miner detail |
-| `/prs/:owner/:repoName/:prNumber` | PR detail |
-| `/my-board` | Personal dashboard (requires GitHub login) |
-| `/help` | Help and links |
-
-## Realtime data
-
-The app subscribes to backend WebSocket events via `useRealtimeData`:
-
-1. On connect, receives `data:full`
-2. After each backend sync, receives updated `data:full` + `data:updated`
-3. All pages read from shared outlet context — no manual refresh needed
-
-Home-page panels derive live lists from cached data in `src/utils/dashboardData.ts`.
-
-## Project structure
-
-```
-src/
-├── App.tsx                 # Routes
-├── components/             # Layout, Header, Footer, avatars, tooltips
-├── context/AuthContext.tsx # GitHub session state
-├── hooks/useRealtimeData.ts
-├── pages/                  # Route pages
-├── services/
-│   ├── api.ts              # REST client
-│   └── socket.ts           # Socket.io client
-├── types/                  # Shared TypeScript types
-└── utils/                  # Formatting, PR status, dashboard helpers
+```bash
+npm run build
+npm run preview                # local smoke test of the production build
 ```
 
-## GitHub login
-
-OAuth is handled by the backend. Configure the GitHub OAuth app in `gittensorminers-back/.env`. After login, **My Board** appears in the nav.
+Serve the `dist/` folder with nginx, Caddy, or any static host. Point `VITE_API_URL` and `VITE_WS_URL` at your deployed backend.
 
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md).
-
-## References
-
-- [Gittensor Docs](https://docs.gittensor.io/)
-- [Gittensor API Swagger](https://api.gittensor.io/swagger#/)
