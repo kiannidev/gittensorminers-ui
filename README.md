@@ -1,25 +1,62 @@
 # Gittensor Miners
 
-A dashboard for miners on **Bittensor Subnet 74 (SN74)** — the subnet that rewards merged GitHub PRs in whitelisted open-source repos.
+A miner intelligence dashboard for **Bittensor Subnet 74 (SN74 / Gittensor)** — built to help miners **analyze repositories and PRs, compare opportunities, monitor live status, and make better mining decisions**.
 
-It reads cached subnet data from the companion backend over REST and WebSocket, and surfaces live miner rankings, whitelisted repositories, recent pull requests, and a personal **My Board** after GitHub sign-in.
+Today the project focuses on SN74. The long-term goal is to extend the same approach across **all Bittensor subnets** — covering miners, validators, registration economics, and subnet-specific mining workflows so users can **choose a subnet and start mining with clearer data**.
 
 Built with React 18, TypeScript, Vite 6, Tailwind CSS, and Socket.io.
 
 ![Gittensor Miners home page](./public/first%20page.png)
 
+## Why this exists
+
+Official explorers show rankings and raw activity, but miners often need **decision statistics** that are hard to infer at a glance — for example:
+
+| Gittensor (SN74) | Bittensor (planned) |
+| --- | --- |
+| Merge rate and maintainer reaction time | Registration fee vs expected reward |
+| Active miners per repo and their scores | Share of miners that actually earn |
+| Reward amount and average score per PR | Reward distribution and mining type |
+| Competition density in a repo | Subnet comparison and entry cost |
+| Effective reward after **maintainer cut** | Validator/miner landscape per subnet |
+
+A high-weight repo is not always the best target. Maintainer cuts, inactive maintainers, and crowded repos can produce **lower returns than a lower-weight alternative**. This dashboard is being built to surface those signals.
+
+## Current scope (SN74)
+
+- Live miner leaderboard, whitelisted repositories, and recent PRs
+- Repo and PR detail views with search
+- Personal **My Board** after GitHub sign-in
+- Real-time updates from the companion backend (no manual refresh)
+
+## Roadmap
+
+**Near term — Gittensor analytics**
+
+- Repo comparison: merge rate, maintainer response time, active miner count, average score per PR
+- Reward modeling: emission share, maintainer cut, and estimated net reward per repo
+- Competition signals: flag repos with slow maintainers or high incumbent miner scores
+- Watchlists and status monitoring for selected repos
+
+**Long term — all Bittensor subnets**
+
+- Subnet browser: registration cost, reward rate, miner count, mining type
+- Cross-subnet comparison to help pick where to mine
+- Validator and miner stats per subnet
+- Guided flows to evaluate a subnet and start mining
+
+Architecture is being kept **subnet-agnostic** where possible so new subnets can plug in without rewriting the core app.
+
 ## Main views
 
-- `/` is the home page — hero, live snapshot panels, and how-it-works.
-- `/miners` shows the miner leaderboard sorted by daily earnings.
-- `/miners/:githubId` is the miner detail view.
-- `/repositories` lists whitelisted repos in list or tile view.
-- `/repositories/:owner/:repoName` is the repo detail view.
-- `/prs/:owner/:repoName/:prNumber` is the pull request detail view.
-- `/my-board` is the signed-in personal dashboard (requires GitHub login).
-- `/help` links to in-app help and resources.
-
-Live data updates automatically after each backend sync — no manual refresh needed.
+- `/` — home page with live snapshot panels and how-it-works
+- `/miners` — miner leaderboard sorted by daily earnings
+- `/miners/:githubId` — miner detail
+- `/repositories` — whitelisted repos (list / tile)
+- `/repositories/:owner/:repoName` — repo detail
+- `/prs/:owner/:repoName/:prNumber` — PR detail
+- `/my-board` — personal dashboard (GitHub login required)
+- `/help` — help and resources
 
 ## Quick start
 
